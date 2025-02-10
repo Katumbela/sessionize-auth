@@ -2,7 +2,7 @@ import { create } from "zustand";
 import Cookies from "js-cookie";
 import { SessionOptions } from "./types";
 
-export function createSessionStore<T>(options?: SessionOptions<T>) {
+export default function createSessionStore<T>(options?: SessionOptions<T>) {
   const storage = {
     get: (): T | null => {
       if (options?.storageType === "localStorage") {

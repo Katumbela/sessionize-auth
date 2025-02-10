@@ -4,6 +4,7 @@
   "description": "A flexible session management library for React, Next.js, Angular, and React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "author": "Joao Afonso Katombela",
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -14,7 +15,6 @@
     "url": "git+https://github.com/Katumbela/sessionize-auth.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Katumbela/sessionize-auth/issues"
@@ -34,7 +34,7 @@
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.8",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0", 
+    "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.2.5"
   }
 }

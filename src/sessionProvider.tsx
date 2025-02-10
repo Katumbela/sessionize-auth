@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { SessionProviderProps } from "./types";
 
 
-export function SessionProvider({
+export default function SessionProvider({
   children,
   useSessionStore,
   redirectPath,
