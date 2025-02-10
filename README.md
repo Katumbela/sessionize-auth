@@ -1,11 +1,10 @@
-# Sessionize Auth
+# Sessionize Auth Lib
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/seu-usuario/sessionize-auth)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)  
 [![npm version](https://img.shields.io/npm/v/sessionize-auth.svg)](https://www.npmjs.com/package/sessionize-auth)
 
 A **Sessionize Auth** é uma biblioteca open source para gerenciamento de sessões em aplicações React. Ela integra o gerenciamento de estado com [Zustand](https://github.com/pmndrs/zustand) e a persistência de dados através de [js-cookie](https://github.com/js-cookie/js-cookie).  
-Com ela, você pode armazenar o estado da sessão do usuário em diferentes _storages_ (`localStorage`, `sessionStorage` ou `cookies`) e proteger rotas utilizando um componente Provider que redireciona usuários não autenticados.
 
 ---
 
@@ -16,7 +15,7 @@ Com ela, você pode armazenar o estado da sessão do usuário em diferentes _sto
 - [Instalação](#instalação)
 - [Documentação](#documentação)
   - [1. Criando a Session Store](#1-criando-a-session-store)
-  - [2. Utilizando o SessionProvider](#2-utilizando-o-sessionprovider)
+  - [2. Utilizando o HOC withAuth](#2-utilizando-o-hoc-withauth)
 - [Exemplo de Aplicação Real](#exemplo-de-aplicação-real)
 - [Testes](#testes)
 - [Contribuições](#contribuições)
@@ -29,7 +28,7 @@ Com ela, você pode armazenar o estado da sessão do usuário em diferentes _sto
 ## Introdução
 
 A **Sessionize Auth** simplifica o gerenciamento de sessões em aplicações React. Ela combina o poder do gerenciamento de estado reativo do [Zustand](https://github.com/pmndrs/zustand) com a persistência de dados por meio de `localStorage`, `sessionStorage` ou `cookies` (usando [js-cookie](https://github.com/js-cookie/js-cookie)).  
-Além disso, o componente `SessionProvider` permite que você defina áreas protegidas na sua aplicação, redirecionando automaticamente os usuários que não estão autenticados para uma rota pré-definida.
+Além disso, o HOC `withAuth` permite que você defina áreas protegidas na sua aplicação, redirecionando automaticamente os usuários que não estão autenticados para uma rota pré-definida.
 
 ---
 
@@ -38,7 +37,7 @@ Além disso, o componente `SessionProvider` permite que você defina áreas prot
 - **Fácil de usar:** Gerencie sessões com métodos simples e diretos.
 - **Multi-storage:** Escolha entre `localStorage`, `sessionStorage` ou `cookies` para persistência.
 - **Estado reativo com Zustand:** Atualize e compartilhe o estado da sessão de forma eficiente.
-- **Proteção de rotas:** Utilize o `SessionProvider` para redirecionar usuários não autenticados.
+- **Proteção de rotas via HOC:** Utilize o `withAuth` para redirecionar usuários não autenticados.
 - **Customizável e Open Source:** Adapte a biblioteca às necessidades do seu projeto e contribua para o seu aprimoramento.
 
 ---
@@ -54,15 +53,6 @@ npm install sessionize-auth
 # Usando yarn
 yarn add sessionize-auth
 ```
-
-<!--
-> **Atenção:** Caso ainda não tenha o Zustand e o js-cookie instalados, adicione-os também:
->
-> ```bash
-> npm install zustand js-cookie
-> # ou
-> yarn add zustand js-cookie
-> ``` -->
 
 ---
 
@@ -111,42 +101,26 @@ useSessionStore.getState().closeSession();
 
 ---
 
-### 2. Utilizando o SessionProvider
+### 2. Utilizando o HOC withAuth
 
-O `SessionProvider` é um componente React que envolve áreas da aplicação que necessitam de autenticação. Ele monitora a _store_ de sessão e, caso não encontre um usuário autenticado, redireciona para o caminho especificado.
-
-#### Propriedades do SessionProvider
-
-- **children:**  
-  Componentes que serão renderizados quando a sessão estiver ativa.
-
-- **useSessionStore:**  
-  A _store_ criada pela função `createSessionStore`.
-
-- **redirectPath:**  
-  Caminho para onde o usuário será redirecionado se não houver uma sessão ativa.
-
+O HOC `withAuth` é uma função de alta ordem que envolve seu componente e verifica a existência de uma sessão ativa. Caso o usuário não esteja autenticado, ele é redirecionado para o caminho definido.
+ 
+ 
 #### Exemplo de Uso
+
+Após definir sua _store_ e seu componente, basta envolver seu componente com o HOC:
 
 ```tsx
 import React from "react";
-import { SessionProvider } from "sessionize-auth";
+import withAuth from "sessionize-auth";
 import { useSessionStore } from "./stores/sessionStore"; // Exemplo de importação da sua store
-import AppRoutes from "./routes/AppRoutes"; // Suas rotas ou componentes protegidos
+import Dashboard from "./pages/Dashboard"; // Seu componente protegido
 
-const App = () => {
-  return (
-    <SessionProvider useSessionStore={useSessionStore} redirectPath="/login">
-      <AppRoutes />
-    </SessionProvider>
-  );
-};
-
-export default App;
+export default withAuth(Dashboard, useSessionStore, "/login");
 ```
 
 > **Observação:**  
-> O `SessionProvider` utiliza o hook `useEffect` para monitorar a sessão. Se o `account` for nulo, o usuário será redirecionado automaticamente para a rota definida em `redirectPath`.
+> O HOC utiliza o hook `useEffect` para monitorar a sessão. Se o `account` for nulo, o usuário será redirecionado automaticamente para a rota definida em `redirectPath`.
 
 ---
 
@@ -173,36 +147,37 @@ export const useSessionStore = createSessionStore<Account>({
 });
 ```
 
-### Passo 2: Configuração do SessionProvider
+### Passo 2: Protegendo Componentes com o HOC withAuth
 
-Envolva as rotas protegidas com o `SessionProvider`:
+Em vez de envolver suas rotas com um provider, você protege cada componente individualmente utilizando o HOC.
+
+#### Página de Dashboard Protegida
 
 ```tsx
-// src/App.tsx
+// src/pages/Dashboard.tsx
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SessionProvider } from "sessionize-auth";
-import { useSessionStore } from "./stores/sessionStore";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import { useSessionStore } from "../stores/session";
+import withAuth from "sessionize-auth";
 
-const App = () => {
+const Dashboard = () => {
+  const { account, closeSession } = useSessionStore();
+
+  const handleLogout = () => {
+    closeSession();
+    window.location.pathname = "/login"; // Redirecionamento após logout
+  };
+
   return (
-    <BrowserRouter>
-      <SessionProvider useSessionStore={useSessionStore} redirectPath="/login">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </SessionProvider>
-    </BrowserRouter>
+    <div>
+      <h1>Dashboard</h1>
+      {account && <p>Bem-vindo, {account.email}</p>}
+      <button onClick={handleLogout}>Sair</button>
+    </div>
   );
 };
 
-export default App;
+export default withAuth(Dashboard, useSessionStore, "/login");
 ```
-
-### Passo 3: Gerenciando a Sessão nos Componentes
 
 #### Página de Login
 
@@ -234,35 +209,6 @@ const Login = () => {
 export default Login;
 ```
 
-#### Página de Dashboard
-
-Permita que o usuário visualize informações e encerre a sessão:
-
-```tsx
-// src/pages/Dashboard.tsx
-import React from "react";
-import { useSessionStore } from "../stores/sessionStore";
-
-const Dashboard = () => {
-  const { account, closeSession } = useSessionStore();
-
-  const handleLogout = () => {
-    closeSession();
-    window.location.pathname = "/login"; // Redirecionamento após logout
-  };
-
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      {account && <p>Bem-vindo, {account.email}</p>}
-      <button onClick={handleLogout}>Sair</button>
-    </div>
-  );
-};
-
-export default Dashboard;
-```
-
 ---
 
 ## Testes
@@ -271,7 +217,7 @@ A biblioteca já conta com testes unitários que cobrem:
 
 - A inicialização da sessão a partir de diferentes _storages_ (`localStorage`, `sessionStorage` e `cookies`).
 - O funcionamento dos métodos `startSession` e `closeSession`.
-- O redirecionamento automático do `SessionProvider` quando não há uma sessão ativa.
+- O redirecionamento automático do HOC `withAuth` quando não há uma sessão ativa.
 
 ### Executando os Testes
 
@@ -305,12 +251,12 @@ Contribuições são muito bem-vindas! Siga os passos abaixo para contribuir:
 5. Abra um Pull Request neste repositório.
 
 ---
-
+<!-- 
 ## Licença
 
 Distribuído sob a [Licença MIT](./LICENSE). Veja o arquivo para mais detalhes.
 
----
+--- -->
 
 ## Contato
 
