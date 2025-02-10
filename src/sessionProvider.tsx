@@ -1,20 +1,25 @@
-import { useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SessionProviderProps } from "./types";
 
-
-export default function SessionProvider({
-  children,
-  useSessionStore,
-  redirectPath,
-}: SessionProviderProps) {
+export default function SessionProvider({ children, useSessionStore, redirectPath }: SessionProviderProps) {
   const { account } = useSessionStore();
+  const navigate = useNavigate();
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!account) {
+    const checkAuth = async () => {
+      if (!account) {
+        navigate(redirectPath);
+      } else {
+        setIsAuthenticated(true);
+      }
+    };
+    checkAuth();
+  }, [account, navigate, redirectPath]);
 
-      window.location.pathname = redirectPath;
-    }
-  }, [account, redirectPath]);
+  if (isAuthenticated === null) return null;
 
   return <>{children}</>;
 }
