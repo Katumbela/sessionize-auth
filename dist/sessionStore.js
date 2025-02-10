@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSessionStore = createSessionStore;
-var zustand_1 = require("zustand");
-var js_cookie_1 = __importDefault(require("js-cookie"));
+exports.default = createSessionStore;
+const zustand_1 = require("zustand");
+const js_cookie_1 = __importDefault(require("js-cookie"));
 function createSessionStore(options) {
-    var storage = {
-        get: function () {
+    const storage = {
+        get: () => {
             if ((options === null || options === void 0 ? void 0 : options.storageType) === "localStorage") {
                 return JSON.parse(localStorage.getItem("account") || "null");
             }
@@ -21,7 +21,7 @@ function createSessionStore(options) {
                     : null;
             }
         },
-        set: function (account) {
+        set: (account) => {
             if ((options === null || options === void 0 ? void 0 : options.storageType) === "localStorage") {
                 localStorage.setItem("account", JSON.stringify(account));
             }
@@ -35,7 +35,7 @@ function createSessionStore(options) {
                 });
             }
         },
-        remove: function () {
+        remove: () => {
             if ((options === null || options === void 0 ? void 0 : options.storageType) === "localStorage") {
                 localStorage.removeItem("account");
             }
@@ -47,15 +47,15 @@ function createSessionStore(options) {
             }
         },
     };
-    return (0, zustand_1.create)(function (set) { return ({
+    return (0, zustand_1.create)((set) => ({
         account: storage.get(),
-        startSession: function (account) {
+        startSession: (account) => {
             storage.set(account);
-            set({ account: account });
+            set({ account });
         },
-        closeSession: function () {
+        closeSession: () => {
             storage.remove();
             set({ account: null });
         },
-    }); });
+    }));
 }

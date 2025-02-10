@@ -1,7 +1,14 @@
 {
-    "compilerOptions": {
-      "jsx": "react-jsx", 
-      "esModuleInterop": true
-    }
-  }
-  
+  "compilerOptions": {
+    "outDir": "dist",  
+    "jsx": "react-jsx",  
+    "declaration": true, 
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "module": "CommonJS",
+    "target": "ES6",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src"]
+}

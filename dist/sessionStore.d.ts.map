@@ -1,0 +1,1 @@
+{"version":3,"file":"sessionStore.d.ts","sourceRoot":"","sources":["../src/sessionStore.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,cAAc,EAAE,MAAM,SAAS,CAAC;AAEzC,MAAM,CAAC,OAAO,UAAU,kBAAkB,CAAC,CAAC,EAAE,OAAO,CAAC,EAAE,cAAc,CAAC,CAAC,CAAC;aAqC5D,CAAC,GAAG,IAAI;kBACH,CAAC,OAAO,EAAE,CAAC,KAAK,IAAI;kBACpB,MAAM,IAAI;IAY3B"}
