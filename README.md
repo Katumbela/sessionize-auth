@@ -54,7 +54,8 @@ npm install sessionize-auth
 # Usando yarn
 yarn add sessionize-auth
 ```
-<!-- 
+
+<!--
 > **Atenção:** Caso ainda não tenha o Zustand e o js-cookie instalados, adicione-os também:
 >
 > ```bash
@@ -159,6 +160,7 @@ Crie uma _store_ para gerenciar a sessão do usuário:
 
 ```tsx
 // src/stores/session.ts
+
 import { createSessionStore } from "sessionize-auth";
 
 interface Account {
